@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author user
  */
-public class VacationManager extends baseManager {
+public class VacationManager extends BaseServletManager {
 
     /**
      * Processes requests for both HTTP
@@ -34,7 +34,8 @@ public class VacationManager extends baseManager {
             if(send.length() > 0) {
                 response.sendRedirect(send);
             }else {
-                mVacationServices.vacationDispatcher(request, response).forward(request, response);
+                mVacationServices.vacationDispatcher(request, response);
+                request.getRequestDispatcher("/WEB-INF/jsp/vacationManager.jsp").forward(request, response);
             }
         } catch (Exception e) {
         }

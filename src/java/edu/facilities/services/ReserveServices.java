@@ -8,6 +8,7 @@ import edu.facilities.dao.FacilitiesInfoDao;
 import edu.facilities.dao.ReserveRecordDao;
 import edu.facilities.dao.UserDao;
 import edu.facilities.dao.VacationDao;
+import edu.facilities.model.FacilitiesInfo;
 import edu.facilities.model.ReserveRecord;
 import edu.facilities.model.User;
 import edu.facilities.model.Vacation;
@@ -37,21 +38,10 @@ public class ReserveServices {
      * @param response
      * @return
      */
-    public RequestDispatcher reserveRecordDispatcher(HttpServletRequest request, HttpServletResponse response) {
+    public void reserveRecordDispatcher(HttpServletRequest request, HttpServletResponse response) {
         String type = Format.null2Blank(request.getParameter("_type"));
-        try {
-            if (type.equals("add")) {
-                addDispatcher(request, response);
-            }else if(type.equals("cancle")) {
-                cancleDispatcher(request, response);
-            }else if(type.equals("absence")) {
-                absenceDispatcher(request, response);
-            }else if(type.equals("noabsence")) {
-                noAbsenceDispatcher(request, response);
-            }
-        } catch (Exception e) {
-        }
         int facilitiesTypeId = Format.str2Int(request.getParameter("facilitiesTypeId"));
+        FacilitiesInfo facilitiesInfo = null;
         if (facilitiesTypeId > 0) {
             try {
                 int facilitiesInfoId = Format.str2Int(request.getParameter("facilitiesInfoId"));
@@ -61,14 +51,27 @@ public class ReserveServices {
                 }
                 request.setAttribute("facilitiesInfoList", mFacilitiesInfoDao.findByTypeID(String.valueOf(facilitiesTypeId)));
                 request.setAttribute("facilitiesInfoId", facilitiesInfoId);
-                request.setAttribute("facilitiesInfo", mFacilitiesInfoDao.findById(facilitiesInfoId));
+                facilitiesInfo = mFacilitiesInfoDao.findById(facilitiesInfoId);
+                request.setAttribute("facilitiesInfo", facilitiesInfo);
             } catch (Exception e) {
             }
         }
+        try {
+            if (type.equals("add")) {
+                addDispatcher(request, response, facilitiesInfo);
+            }else if(type.equals("cancle")) {
+                cancleDispatcher(request, response);
+            }else if(type.equals("absence")) {
+                absenceDispatcher(request, response);
+            }else if(type.equals("noabsence")) {
+                noAbsenceDispatcher(request, response);
+            }
+        } catch (Exception e) {
+        }
+        
         request.setAttribute("facilitiesTypeId", facilitiesTypeId);
         request.setAttribute("fid", 4);
         request.setAttribute("currentdate", Format.formatDate(new Date()));
-        return request.getRequestDispatcher("/WEB-INF/jsp/reserveManager.jsp");
     }
     /**
      * 未缺席设置
@@ -145,19 +148,19 @@ public class ReserveServices {
      * @return
      * @throws Exception 
      */
-    public void addDispatcher(HttpServletRequest request, HttpServletResponse response) throws Exception{
+    public void addDispatcher(HttpServletRequest request, HttpServletResponse response, FacilitiesInfo facilitiesInfo) throws Exception{
         String startdate = Format.null2Blank(request.getParameter("startdate"));
         String enddate = Format.null2Blank(request.getParameter("enddate"));
         String[] hour = request.getParameterValues("_hour");
         startdate = startdate + " " + hour[0];
         enddate = enddate + " " + hour[1];
         String validStr = isValidVacation(startdate, enddate);
-        if(validStr.equals("true")) {
-            int facilitiesInfoId = Format.str2Int(request.getParameter("facilitiesInfoId"));
+        if(validStr.equals("true") && null != facilitiesInfo) {
             ReserveRecord rr = new ReserveRecord();
             rr.setCreateDate(Format.formatDate(new Date()));
             rr.setEndDate(enddate);
-            rr.setFacilityID(facilitiesInfoId);
+            rr.setFacilityID(facilitiesInfo.getId());
+            rr.setFacilityName(facilitiesInfo.getName());
             rr.setIsAbsence(0);
             rr.setStartDate(startdate);
             rr.setUserID(Format.str2Int(request.getSession().getAttribute("userId")));
@@ -230,8 +233,7 @@ public class ReserveServices {
      * @param response
      * @return 
      */
-    public RequestDispatcher reportDispatcher(HttpServletRequest request, HttpServletResponse response) {
+    public void reportDispatcher(HttpServletRequest request, HttpServletResponse response) {
         request.setAttribute("fid", 7);
-        return request.getRequestDispatcher("/WEB-INF/jsp/facilitiesReport.jsp");
     }
 }

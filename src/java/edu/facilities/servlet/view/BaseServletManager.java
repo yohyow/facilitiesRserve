@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author user
  */
-public class baseManager extends HttpServlet {
+public class BaseServletManager extends HttpServlet {
 
     
     public String sessionRequest(HttpServletRequest request, HttpServletResponse response) throws Exception{

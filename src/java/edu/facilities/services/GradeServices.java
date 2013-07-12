@@ -36,7 +36,7 @@ public class GradeServices {
      * @param response
      * @return 
      */
-    public RequestDispatcher GradeDispatcher(HttpServletRequest request, HttpServletResponse response) {
+    public void GradeDispatcher(HttpServletRequest request, HttpServletResponse response) {
         try {
             String type = Format.null2Blank(request.getParameter("_type"));
             if (type.equals("add")) {
@@ -49,7 +49,6 @@ public class GradeServices {
         } catch (Exception e) {
         }
         request.setAttribute("fid", 2);
-        return request.getRequestDispatcher("/WEB-INF/jsp/gradeManager.jsp");
     }
     
     /**

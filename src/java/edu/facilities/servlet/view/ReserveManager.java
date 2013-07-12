@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author user
  */
-public class ReserveManager extends baseManager {
+public class ReserveManager extends BaseServletManager {
 
     /**
      * Processes requests for both HTTP
@@ -35,7 +35,8 @@ public class ReserveManager extends baseManager {
             if(send.length() > 0) {
                 response.sendRedirect(send);
             }else {
-                mReserveServices.reserveRecordDispatcher(request, response).forward(request, response);
+                mReserveServices.reserveRecordDispatcher(request, response);
+                request.getRequestDispatcher("/WEB-INF/jsp/reserveManager.jsp").forward(request, response);
             }
         } catch (Exception e) {
         }

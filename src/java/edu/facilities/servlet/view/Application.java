@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author user
  */
-public class Application extends baseManager {
+public class Application extends BaseServletManager {
 
     /**
      * Processes requests for both HTTP

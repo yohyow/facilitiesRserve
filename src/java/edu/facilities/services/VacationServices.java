@@ -27,7 +27,7 @@ public class VacationServices {
      * @return
      * @throws Exception 
      */
-    public RequestDispatcher vacationDispatcher(HttpServletRequest request, HttpServletResponse response) throws Exception{
+    public void vacationDispatcher(HttpServletRequest request, HttpServletResponse response) throws Exception{
         try {
             String type = Format.null2Blank(request.getParameter("_type"));
             if (type.equals("add")) {
@@ -42,7 +42,6 @@ public class VacationServices {
         } catch (Exception e) {
         }
         request.setAttribute("fid", 5);
-        return request.getRequestDispatcher("/WEB-INF/jsp/vacationManager.jsp");
     }
     
     /**

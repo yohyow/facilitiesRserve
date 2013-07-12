@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author user
  */
-public class FacilitiesManager extends baseManager {
+public class FacilitiesManager extends BaseServletManager {
 
     /**
      * Processes requests for both HTTP
@@ -34,7 +34,8 @@ public class FacilitiesManager extends baseManager {
             if(send.length() > 0) {
                 response.sendRedirect(send);
             }else {
-                mFacilitiesServices.facilitiesDispatcher(request, response).forward(request, response);
+                mFacilitiesServices.facilitiesDispatcher(request, response);
+                request.getRequestDispatcher("/WEB-INF/jsp/facilitiesManager.jsp").forward(request, response);
             }
         }catch(Exception e) {
         }

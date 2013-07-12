@@ -27,7 +27,7 @@ public class FacilitiesServices {
      * 设备管理分发方法
      * @return 
      */
-    public RequestDispatcher facilitiesDispatcher(HttpServletRequest request, HttpServletResponse response) {
+    public void facilitiesDispatcher(HttpServletRequest request, HttpServletResponse response) {
         String type = Format.null2Blank(request.getParameter("_type"));
         if(type.equals("add")) {
             add(request);
@@ -45,7 +45,6 @@ public class FacilitiesServices {
         request.setAttribute("facilitiesList", list);
         request.setAttribute("facilitiestype", facilitiesTypeId);
         request.setAttribute("fid", 3);
-        return request.getRequestDispatcher("/WEB-INF/jsp/facilitiesManager.jsp");
     }
     
     /**

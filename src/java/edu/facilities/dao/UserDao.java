@@ -201,5 +201,4 @@ public class UserDao extends BaseDao<User, Integer> {
         }
         return list;
     }
-
 }

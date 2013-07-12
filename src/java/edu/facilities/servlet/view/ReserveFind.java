@@ -11,10 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * 预约查询视图
  *
- * @author Administrator
+ * @author user
  */
-public class ReserveFind extends baseManager {
+public class ReserveFind extends BaseServletManager {
 
     /**
      * Processes requests for both HTTP
@@ -33,7 +34,8 @@ public class ReserveFind extends baseManager {
             if(send.length() > 0) {
                 response.sendRedirect(send);
             }else {
-                mReserveFindServices.reserveFindDispatcher(request, response).forward(request, response);
+                mReserveFindServices.reserveFindDispatcher(request, response);
+                request.getRequestDispatcher("/WEB-INF/jsp/reserveFind.jsp").forward(request, response);
             }
         } catch (Exception e) {
         }

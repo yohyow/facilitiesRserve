@@ -70,14 +70,14 @@
             <form id="_form1" action="<%=request.getContextPath()%>/reserveManager.do" method="post">
                 <input type="hidden" id="_type" name="_type" value="<%=request.getAttribute("type")%>" />
                 <ul class="personnel_top">
-                    <%
-                        int ftypeid = Format.str2Int(request.getAttribute("facilitiesTypeId"));
-                        FacilitiesInfo finfo = null;
-                        try{
-                            finfo = (FacilitiesInfo)request.getAttribute("facilitiesInfo");
-                        }catch(Exception e){
-                        }
-                    %>
+                        <%
+                            int ftypeid = Format.str2Int(request.getAttribute("facilitiesTypeId"));
+                            FacilitiesInfo finfo = null;
+                            try{
+                                finfo = (FacilitiesInfo)request.getAttribute("facilitiesInfo");
+                            }catch(Exception e){
+                            }
+                        %>
                         <li class="personnel_top_sel">
                              <label>设备类型：</label><select id="select_facilitiesTypeId" name="facilitiesTypeId" class="personnel_width">
                                 <option value="0" <%=ftypeid == 0 ? "selected = 'selected'":""%>>请选择</option>
@@ -148,7 +148,6 @@
                             sb.append("<li>是否缺席</li>");
                             sb.append("<li class='action'>操作</li>");
                             sb.append("</ul>");
-                            int flag = 1;
                             for (ReserveRecord reserveRecord : reserveRecords) {
                                 sb.append("<ul>");
                                 sb.append("<li>");

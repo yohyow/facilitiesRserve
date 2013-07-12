@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author user
  */
-public class UserManager extends baseManager {
+public class UserManager extends BaseServletManager {
 
     /**
      * Processes requests for both HTTP
@@ -35,7 +35,8 @@ public class UserManager extends baseManager {
             if(send.length() > 0) {
                 response.sendRedirect(send);
             }else {
-                mUserServices.userDispatcher(request, response).forward(request, response);
+                mUserServices.userDispatcher(request, response);
+                request.getRequestDispatcher("/WEB-INF/jsp/userManager.jsp").forward(request, response);
             }
         } catch (Exception e) {
         }

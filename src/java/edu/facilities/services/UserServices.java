@@ -72,7 +72,7 @@ public class UserServices {
      * @param response
      * @return 
      */
-    public RequestDispatcher userDispatcher(HttpServletRequest request, HttpServletResponse response) {
+    public void userDispatcher(HttpServletRequest request, HttpServletResponse response) {
         try {
             String type = Format.null2Blank(request.getParameter("_type"));
             if(type.equals("select")) {
@@ -106,7 +106,6 @@ public class UserServices {
         } catch (Exception e) {
         }
         request.setAttribute("fid", 1);
-        return request.getRequestDispatcher("/WEB-INF/jsp/userManager.jsp");
     }
     
     /**

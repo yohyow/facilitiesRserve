@@ -7,7 +7,6 @@ package edu.facilities.servlet.view;
 import edu.facilities.services.GradeServices;
 import java.io.IOException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author user
  */
-public class gradeManager extends baseManager {
+public class gradeManager extends BaseServletManager {
 
     /**
      * Processes requests for both HTTP
@@ -35,7 +34,8 @@ public class gradeManager extends baseManager {
             if(send.length() > 0) {
                 response.sendRedirect(send);
             }else {
-                mGradeServices.GradeDispatcher(request, response).forward(request, response);
+                mGradeServices.GradeDispatcher(request, response);
+                request.getRequestDispatcher("/WEB-INF/jsp/gradeManager.jsp").forward(request, response);
             }
         } catch (Exception e) {
         }

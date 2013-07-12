@@ -241,11 +241,11 @@ public class ReserveRecordDao extends BaseDao<ReserveRecord, Integer> {
         StringBuilder sql = new StringBuilder();
         sql.append("select * from fr_reserverecord where facilityId = ");
         sql.append(facilityId);
-        sql.append(" and startdate >= ");
+        sql.append(" and startdate >= '");
         sql.append(startdate);
-        sql.append(" and enddate <= ");
+        sql.append("' and enddate <= '");
         sql.append(enddate);
-        sql.append(" order by enddate desc");
+        sql.append("' order by enddate desc");
         PreparedStatement ps = getPreparedStatement(sql.toString());
         ResultSet rs = ps.executeQuery();
         List<ReserveRecord> list = new ArrayList<ReserveRecord>();

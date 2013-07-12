@@ -18,7 +18,7 @@
     </servlet>
     <servlet>
         <servlet-name>baseManager</servlet-name>
-        <servlet-class>edu.facilities.servlet.view.baseManager</servlet-class>
+        <servlet-class>edu.facilities.servlet.view.BaseServletManager</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>FacilitiesManager</servlet-name>
