@@ -54,5 +54,4 @@ public class FunctionDao extends BaseDao<Function, Integer> {
         }
         return list;
     }
-
 }

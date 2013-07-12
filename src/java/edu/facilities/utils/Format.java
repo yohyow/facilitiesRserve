@@ -92,8 +92,36 @@ public class Format {
         return null;
     }
     
+    /**
+     * 格式化日期为yyyy-MM格式
+     * @param date
+     * @return 
+     */
+    public static String formatStringToMonth(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        try {
+            return sdf.format(date);
+        } catch (Exception e) {
+        }
+        return null;
+    }
+    
+    /**
+     * 格式化日期为yyyy-MM格式
+     * @param date
+     * @return 
+     */
+    public static Date formatStringToMonth(String date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        try {
+            return sdf.parse(date);
+        } catch (Exception e) {
+        }
+        return null;
+    }
+    
      /**
-     * 格式化日期
+     * 格式化日期为yyyy-MM-dd格式
      * @param date
      * @return 
      */
@@ -107,7 +135,21 @@ public class Format {
     }
     
     /**
-     * 格式化日期
+     * 格式化日期为yyyy-MM-dd格式
+     * @param date
+     * @return 
+     */
+    public static String formatString(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            return sdf.format(date);
+        } catch (Exception e) {
+        }
+        return null;
+    }
+    
+    /**
+     * 格式化日期为yyyy-MM-dd HH:mm格式
      * @param date
      * @return 
      */

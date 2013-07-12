@@ -1,3 +1,4 @@
+<%@page import="edu.facilities.model.ReserveRecord"%>
 <%@page import="edu.facilities.utils.Format"%>
 <%@page import="edu.facilities.model.FacilitiesInfo"%>
 <%@page import="java.util.List"%>
@@ -19,7 +20,6 @@
                     $("#_type").val("select");//查询按钮点击后类型为select
                     $("#_form1").submit();
                 });
-                
                 $("#_month").datepicker({//添加日期选择功能 
                     changeMonth: true,
 //                    changeYear: true,
@@ -30,8 +30,8 @@
                     closeText:"关闭",//关闭选择框的按钮名称  
                     yearSuffix: '年', //年的后缀  
                     showMonthAfterYear:true,//是否把月放在年的后面  
-                    defaultDate:'2013-06-30',//默认日期  
-                    maxDate:'2013-06-30',//最大日期  
+                    defaultDate:'<%=Format.null2Blank(request.getAttribute("maxdate"))%>',//默认日期  
+                    maxDate:'<%=Format.null2Blank(request.getAttribute("maxdate"))%>',//最大日期  
                     //monthNames: ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],  
                     //dayNames: ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'],  
                     //dayNamesShort: ['周日','周一','周二','周三','周四','周五','周六'],  
@@ -40,8 +40,9 @@
                         var date = dateText.split("-");
                         $(this).val(date[0] + "-" + date[1]);
                     }
-                    
-                });  
+                });
+                var monthDate = '<%=Format.null2Blank(request.getAttribute("monthDate"))%>';
+                $("#_month").val(monthDate);
             });
         </script>
     </head>
@@ -59,21 +60,53 @@
                         <li class="personnel_top_sel">
                             <input type="button" id="_selectfacilities" value="查询" />
                         </li>
-                        <%
-                            String msg = Format.null2Blank(request.getAttribute("errorMsg"));
-                            if (msg.length() > 0) {
-                                StringBuilder sb = new StringBuilder();
-                                sb.append("(<span style='color:red'>");
-                                sb.append(msg);
-                                sb.append("</span>)");
-                                out.print(sb.toString());
-                            }
-                        %>
                     </ul>
                     <div class="personnel_list" id="_selectlistdiv">
-                        
-                        <input type="hidden" value="" name="_facilitiesinfoid" id="_facilitiesinfoid"/>
-                    </div>
+                            <%
+                                StringBuilder sb = new StringBuilder();
+                                try {
+                                    int flag = 1;
+                                    List<ReserveRecord> reserveRecords = (List<ReserveRecord>) request.getAttribute("reserverecordList");
+                                    sb.append("<ul>");
+                                    sb.append("<li>序号</li>");
+                                    sb.append("<li>姓名</li>");
+                                    sb.append("<li>设备名称</li>");
+                                    sb.append("<li>预约开始时间</li>");
+                                    sb.append("<li>预约结束时间</li>");
+                                    sb.append("<li class='action'>是否缺席</li>");
+                                    sb.append("</ul>");
+                                    for (ReserveRecord rr : reserveRecords) {
+                                        sb.append("<ul>");
+                                        sb.append("<li>");
+                                        sb.append(flag);
+                                        sb.append("</li>");
+                                        sb.append("<li>");
+                                        sb.append(rr.getUserName());
+                                        sb.append("</li>");
+                                        sb.append("<li>");
+                                        sb.append(rr.getFacilityName());
+                                        sb.append("</li>");
+                                        sb.append("<li>");
+                                        sb.append(rr.getStartDate());
+                                        sb.append("</li>");
+                                        sb.append("<li>");
+                                        sb.append(rr.getEndDate());
+                                        sb.append("</li>");
+                                        sb.append("<li class='action'>");
+                                        if(rr.getIsAbsence() == 0) {
+                                            sb.append("未缺席");
+                                        }else {
+                                            sb.append("缺席");
+                                        }
+                                        sb.append("</li>");
+                                        sb.append("</ul>");
+                                        flag ++;
+                                    }
+                                } catch (Exception e) {
+                                }
+                                out.print(sb.toString());
+                            %>
+                    </div>  
                 </form>
             </div>
     </body>

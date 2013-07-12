@@ -13,6 +13,7 @@ import edu.facilities.model.ReserveRecord;
 import edu.facilities.model.User;
 import edu.facilities.model.Vacation;
 import edu.facilities.utils.Format;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.RequestDispatcher;
@@ -152,8 +153,8 @@ public class ReserveServices {
         String startdate = Format.null2Blank(request.getParameter("startdate"));
         String enddate = Format.null2Blank(request.getParameter("enddate"));
         String[] hour = request.getParameterValues("_hour");
-        startdate = startdate + " " + hour[0];
-        enddate = enddate + " " + hour[1];
+        startdate = startdate + " " + hour[0] + ":00";//补全以适应derby数据库的timstamp函数
+        enddate = enddate + " " + hour[1] + ":00";//补全以适应derby数据库的timstamp函数
         String validStr = isValidVacation(startdate, enddate);
         if(validStr.equals("true") && null != facilitiesInfo) {
             ReserveRecord rr = new ReserveRecord();
@@ -234,6 +235,50 @@ public class ReserveServices {
      * @return 
      */
     public void reportDispatcher(HttpServletRequest request, HttpServletResponse response) {
+        String monthDate = Format.null2Blank(request.getParameter("_month"));
+        if(monthDate.length() > 0) {
+            try {
+                String nowDate = Format.formatStringToMonth(new Date());
+                if(Format.compareDateWithDate(Format.formatStringToMonth(monthDate), Format.formatStringToMonth(nowDate)) == -1) {
+                    String[] date = getMaxAndMinDate(Format.formatStringToMonth(monthDate), true);
+                    List<ReserveRecord> list = mReserveRecordDao.findReserveRecordByDatesAndFacilityId(date[1] + " 00:00:00", date[0] + " 21:30:00", 0);//最晚21:30
+                    request.setAttribute("reserverecordList", list);
+                }
+            } catch (Exception e) {
+            }
+        }
+        request.setAttribute("maxdate", getMaxAndMinDate(new Date(), false)[0]);
+        request.setAttribute("monthDate", monthDate);
         request.setAttribute("fid", 7);
+    } 
+    
+    /**
+     * 得到某日期的最大和最小日期
+     * @param date
+     * @param isSelect
+     * @return 
+     */
+    private String[] getMaxAndMinDate(Date date, boolean isSelect) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        if(!isSelect) {
+            if (calendar.getTime().getTime() != Format.formatString(Format.formatString(new Date())).getTime()) {
+                calendar.add(Calendar.MONTH, -1);
+            }
+        }
+        String maxDate = Format.formatString(calendar.getTime());
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+        String minDate = Format.formatString(calendar.getTime());
+        return new String[]{maxDate, minDate};
     }
+    
+    
+//    public static void main(String[] args) {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(new Date());
+//        System.out.println(Format.formatStringToMonth(calendar.getTime()));
+//        calendar.add(Calendar.MONTH, -1);
+//        System.out.print(Format.formatStringToMonth(calendar.getTime()));
+//    }
 }

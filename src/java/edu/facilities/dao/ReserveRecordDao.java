@@ -95,38 +95,6 @@ public class ReserveRecordDao extends BaseDao<ReserveRecord, Integer> {
     }
     
     /**
-     * 查询某段时间内的某设备预约记录
-     * @param facilityID
-     * @param startDate
-     * @param endDate
-     * @return 
-     */
-    public List<ReserveRecord> findByfacilityIDAndDate(int facilityID, String startDate, String endDate) throws Exception{
-        StringBuilder sql = new StringBuilder();
-        if(facilityID == 0) {
-            sql.append("select * from fr_reserveRecord where ");
-            sql.append(" startDate = '");
-        }else {
-            sql.append("select * from fr_reserveRecord where facilityID = ");
-            sql.append(facilityID);
-            sql.append(", and startDate = '");
-        }
-        sql.append(startDate);
-        sql.append("', and enddate = '");
-        sql.append(endDate);
-        sql.append("'");
-        PreparedStatement ps = getPreparedStatement(sql.toString());
-        ResultSet rs = ps.executeQuery();
-        ArrayList<ReserveRecord> list = new ArrayList<ReserveRecord>();
-        while(rs.next()) {
-            ReserveRecord reserveRecord = new ReserveRecord();
-            reserveRecord = getReserveRecord(rs, reserveRecord);
-            list.add(reserveRecord);
-        }
-        return list;
-    }
-    
-    /**
      * 根据设备查询预约记录
      * @param facilitiesId
      * @return
@@ -239,13 +207,18 @@ public class ReserveRecordDao extends BaseDao<ReserveRecord, Integer> {
      */
     public List<ReserveRecord> findReserveRecordByDatesAndFacilityId(String startdate, String enddate, int facilityId) throws Exception{
         StringBuilder sql = new StringBuilder();
-        sql.append("select * from fr_reserverecord where facilityId = ");
-        sql.append(facilityId);
-        sql.append(" and startdate >= '");
+        if (facilityId > 0) {
+            sql.append("select * from fr_reserverecord where facilityId = ");
+            sql.append(facilityId);
+            sql.append(" and");
+        }else {
+            sql.append("select * from fr_reserverecord where");
+        }
+        sql.append(" TimeStamp(startdate) >= TimeStamp('");
         sql.append(startdate);
-        sql.append("' and enddate <= '");
+        sql.append("') and TimeStamp(enddate) <= TimeStamp('");
         sql.append(enddate);
-        sql.append("' order by enddate desc");
+        sql.append("') order by enddate desc");
         PreparedStatement ps = getPreparedStatement(sql.toString());
         ResultSet rs = ps.executeQuery();
         List<ReserveRecord> list = new ArrayList<ReserveRecord>();
@@ -256,4 +229,4 @@ public class ReserveRecordDao extends BaseDao<ReserveRecord, Integer> {
         }
         return list;
     }
-}
+ }
