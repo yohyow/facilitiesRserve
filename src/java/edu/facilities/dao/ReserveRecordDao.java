@@ -198,6 +198,28 @@ public class ReserveRecordDao extends BaseDao<ReserveRecord, Integer> {
     }
     
     /**
+     * 找到某用户对某设备的预约记录
+     * @param userId
+     * @param nowDate
+     * @return
+     * @throws Exception 
+     */
+    public long findReserveRecordByUserIdAndNoExpiry(int userId, String nowDate) throws Exception{
+        StringBuilder sql = new StringBuilder();
+        sql.append("select count(id) num from fr_reserverecord where userid = ");
+        sql.append(userId);
+        sql.append(" and TimeStamp(startdate) >= TimeStamp('");
+        sql.append(nowDate);
+        sql.append("')");
+        PreparedStatement ps = getPreparedStatement(sql.toString());
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {            
+            return rs.getLong("num");
+        }
+        return 0;
+    }
+    
+    /**
      * 找到某设备某时间段预约记录
      * @param stratdate
      * @param enddate

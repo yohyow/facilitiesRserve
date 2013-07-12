@@ -46,6 +46,7 @@ public class UserServices {
             }else if(user.getPassword().equals(password)) {
                 request.getSession().setAttribute("userId", user.getId());
                 request.getSession().setAttribute("userName", user.getName());
+                request.getSession().setAttribute("userType", user.getUserTypeID());
                 return request.getRequestDispatcher("/application.do");
             }
         }else {

@@ -16,7 +16,6 @@ import edu.facilities.utils.Format;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +30,8 @@ public class ReserveServices {
     private FacilitiesInfoDao mFacilitiesInfoDao = new FacilitiesInfoDao();
     private UserDao mUserDao = new UserDao();
     private VacationDao mVacationDao = new VacationDao();
+    private int mUserTypeId = 0;
+    private int mUserId = 0;
 
     /**
      * 预约管理控制方法
@@ -57,6 +58,8 @@ public class ReserveServices {
             } catch (Exception e) {
             }
         }
+        mUserTypeId = Format.str2Int(request.getSession().getAttribute("userTypeId"));
+        mUserId = Format.str2Int(request.getSession().getAttribute("userId"));
         try {
             if (type.equals("add")) {
                 addDispatcher(request, response, facilitiesInfo);
@@ -134,12 +137,24 @@ public class ReserveServices {
      */
     public void cancleDispatcher(HttpServletRequest request, HttpServletResponse response) throws Exception{
         int reserverecordid = Format.str2Int(request.getParameter("_reserverecordid"));
-        ReserveRecord rr = new ReserveRecord();
-        rr.setId(reserverecordid);
-        try {
+        ReserveRecord rr = mReserveRecordDao.findById(reserverecordid);
+        if (null != rr) {
+            if (mUserTypeId == 4) {//学生
+                Date nDate = new Date();
+                nDate.setTime(nDate.getTime() + Format.LONG_ONE_DAY);
+                if(Format.compareDateWithDate(nDate, Format.formatDate(rr.getStartDate())) == 1) {
+                    request.setAttribute("errorMsg", "无法取消，您需要提前24小时取消预约！");
+                    return;
+                }
+            }
             int flag = mReserveRecordDao.del(rr);
-        } catch (Exception e) {
+            if(flag > 0) {
+                request.setAttribute("errorMsg", "取消预约成功！");
+            }else {
+                request.setAttribute("errorMsg", "取消预约失败！");
+            }
         }
+        request.setAttribute("errorMsg", "预约记录已经不存在！");
     }
     
     /**
@@ -179,15 +194,33 @@ public class ReserveServices {
      * 是否为有效日期
      * @param request
      * @param response
+     * @param userTypeId
      * @return 
      */
     public String isValidVacation(String fromstartdate, String fromenddate) {
         try {
-            if(Format.compareDateWithDate(Format.formatStringWithHour(fromstartdate), new Date()) != 1) {
+            if(Format.compareDateWithDate(Format.formatDate(fromstartdate), new Date()) != 1) {
                 return "开始日期要大于当前日期，请重新选择";
             }
-            if(Format.compareDateWithDate(Format.formatStringWithHour(fromenddate), Format.formatStringWithHour(fromstartdate)) != 1) {
+            if(Format.compareDateWithDate(Format.formatDate(fromenddate), Format.formatDate(fromstartdate)) != 1) {
                 return "结束日期要大于开始日期，请重新选择";
+            }
+            Date nDate = new Date();
+            if (mUserTypeId == 2 || mUserTypeId == 3) {//操作员或者老师
+                nDate.setTime(nDate.getTime() + Format.LONG_ONE_YEAR);
+                if (Format.compareDateWithDate(nDate, Format.formatDate(fromstartdate)) == -1) {
+                    return "您只能预约一年以内的设备！";
+                }
+            }else if(mUserTypeId == 4) {//学生
+                nDate.setTime(nDate.getTime() + Format.LONG_TWO_MONTH);
+                if (Format.compareDateWithDate(nDate, Format.formatDate(fromstartdate)) == -1) {
+                    return "您只能预约两个月以内的设备！";
+                }
+                // 查下学生的预约设备数 不能超过五个
+                long num = mReserveRecordDao.findReserveRecordByUserIdAndNoExpiry(mUserId, Format.formatDate(new Date()));
+                if (num >= 5) {
+                    return "您最多只能预约五个设备奥！";
+                }
             }
             List<Vacation> list = mVacationDao.findAll();
             for(Vacation vacation: list) {
@@ -212,11 +245,11 @@ public class ReserveServices {
                 String startdate = reserveRecord.getStartDate();
                 String enddate = reserveRecord.getEndDate();
                 //第一种时间段都在某假期开始前
-                if((Format.compareDateWithHour(fromstartdate, startdate) == -1) && (Format.compareDateWithHour(fromenddate, startdate) == -1)) {
+                if((Format.compareDateWithReserve(fromstartdate, startdate) == -1) && (Format.compareDateWithReserve(fromenddate, startdate) == -1)) {
                     flag = true;
                 }
                 //第二种时间段都在某假期之后
-                if(((Format.compareDateWithHour(fromstartdate, enddate) == 1) || (Format.compareDateWithHour(fromstartdate, enddate) == 0)) && (Format.compareDateWithHour(fromenddate, enddate) == 1)) {
+                if(((Format.compareDateWithReserve(fromstartdate, enddate) == 1) || (Format.compareDateWithReserve(fromstartdate, enddate) == 0)) && (Format.compareDateWithReserve(fromenddate, enddate) == 1)) {
                     flag = true;
                 }
                 if(!flag) {
