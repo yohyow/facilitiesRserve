@@ -9,7 +9,6 @@ import edu.facilities.dao.GradeDao;
 import edu.facilities.model.Grade;
 import edu.facilities.utils.Format;
 import java.util.List;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,7 +47,7 @@ public class GradeServices {
             request.setAttribute("gradelist", list);
         } catch (Exception e) {
         }
-        request.setAttribute("fid", 2);
+        request.setAttribute("fid", 5);
     }
     
     /**

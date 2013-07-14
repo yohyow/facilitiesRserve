@@ -22,30 +22,36 @@
                 $("#_startdate").datepicker( "option", "dateFormat", "yy-mm-dd");
                 $("#_enddate").datepicker();
                 $("#_enddate").datepicker( "option", "dateFormat", "yy-mm-dd");
+                //默认隐藏开始日期和结束日期
+                //显示列表
                 $("#_addreservediv").hide();
                 $("#_selectlistdiv").show();
+                //绑定查询按钮的点击事件
                 $("#_selectreserve").click(function() {
                     $("#_type").val("select");
                     $("#_form1").submit();
                 });
+                //绑定设备类型 值改变时提交form
                 $("#select_facilitiesTypeId").change(function() {
                     $("#_type").val("select");
                     $("#_form1").submit();
                 });
-                
+                //添加预约按钮点击时 更改type为add并且隐藏列表显示开始日期和结束日期选择
                 $("#_addreserve").click(function() {
                     $("#_type").val("add");
                     $("#_selectlistdiv").hide();
                     $("#_addreservediv").show();
                 });
             });
+            //取消预约函数 点击取消预约按钮时调用此函数
             function cancle(rid) {
                 if(confirm("确定取消预约吗？")) {
-                    $("#_reserverecordid").val(rid);
-                    $("#_type").val("cancle");
-                    $("#_form1").submit();
+                    $("#_reserverecordid").val(rid);//设定预约记录表id
+                    $("#_type").val("cancle");//类型为cancle
+                    $("#_form1").submit();//提交form
                 }
             }
+            //设置缺席函数 点击缺席按钮调用此函数
             function absence(rid) {
                 if(confirm("确定要设置缺席吗？")) {
                     $("#_reserverecordid").val(rid);
@@ -53,6 +59,7 @@
                     $("#_form1").submit();
                 }
             }
+            //未缺席函数 点击未缺席按钮调用此函数
             function noabsence(rid) {
                 if(confirm("确定要更改为未缺席吗？")) {
                     $("#_reserverecordid").val(rid);
@@ -175,11 +182,15 @@
                                     sb.append(reserveRecord.getId());
                                     sb.append(");'>取消预约</a>");
                                 }
-                                sb.append("&nbsp;&nbsp;<a href='javascript:absence(");
-                                sb.append(reserveRecord.getId());
-                                sb.append(");'>缺席</a>&nbsp;&nbsp;<a href='javascript:noabsence(");
-                                sb.append(reserveRecord.getId());
-                                sb.append(");'>未缺席</a></li>");
+                                int userTypeID = Format.str2Int(request.getSession().getAttribute("userTypeId"));
+                                if(userTypeID != 4 && userTypeID > 0) {//4是学生id
+                                    sb.append("&nbsp;&nbsp;<a href='javascript:absence(");
+                                    sb.append(reserveRecord.getId());
+                                    sb.append(");'>缺席</a>&nbsp;&nbsp;<a href='javascript:noabsence(");
+                                    sb.append(reserveRecord.getId());
+                                    sb.append(");'>未缺席</a>");
+                                }
+                                sb.append("</li>");
                                 sb.append("</ul>");
                             }
                         } catch (Exception e) {

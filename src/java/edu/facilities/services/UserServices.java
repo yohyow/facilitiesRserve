@@ -6,10 +6,13 @@
 package edu.facilities.services;
 
 import edu.facilities.dao.GradeDao;
+import edu.facilities.dao.ReserveRecordDao;
 import edu.facilities.dao.UserDao;
 import edu.facilities.model.Grade;
 import edu.facilities.model.User;
 import edu.facilities.utils.Format;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.RequestDispatcher;
@@ -25,6 +28,7 @@ public class UserServices {
 
     private UserDao mUserDao = new UserDao();
     private GradeDao mGradeDao = new GradeDao();
+    private ReserveRecordDao mrReserveRecordDao = new ReserveRecordDao();
     /**
      * 登录
      * 
@@ -44,10 +48,34 @@ public class UserServices {
             if(user.getIsValid() == 0) {
                 request.setAttribute("errorMsg", "对不起，您的帐号无效!");
             }else if(user.getPassword().equals(password)) {
+                if (user.getAbsenceNum() >= 3) {
+                    if (user.getAbsenceDate().length() <= 0) {
+                        //如果缺席次数三次但是缺席日期没有则 从现在开始计时
+                        user.setAbsenceDate(Format.formatDate(new Date()));
+                        try {
+                           mUserDao.saveOrUpdate(user); 
+                        } catch (Exception e) {
+                        }
+                        request.setAttribute("errorMsg", user.getAbsenceDate() + "开始，您已经缺席三次，被锁定一个月");
+                        return request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
+                    }else {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(Format.formatDate(user.getAbsenceDate()));
+                        calendar.add(Calendar.DAY_OF_MONTH, 30);
+                        if (Format.compareDateWithDate(new Date(), calendar.getTime()) == 1) {
+                            //这样说明帐号无效已经超过一个月了 允许登录 恢复缺席次数
+                            user.setAbsenceDate("");
+                            user.setAbsenceNum(0);
+                        }
+                    }
+                    
+                }
                 request.getSession().setAttribute("userId", user.getId());
                 request.getSession().setAttribute("userName", user.getName());
-                request.getSession().setAttribute("userType", user.getUserTypeID());
+                request.getSession().setAttribute("userTypeId", user.getUserTypeID());
                 return request.getRequestDispatcher("/application.do");
+            }else {
+                request.setAttribute("errorMsg", "用户名或者密码不正确！");
             }
         }else {
             request.setAttribute("errorMsg", "用户名或者密码不正确！");
@@ -87,11 +115,23 @@ public class UserServices {
             }else if(type.equals("del")) {
                 delUserDispatcher(request, response);
                 selectUserDispatcher(request, response);
+            }else if(type.equals("isvalid")) {
+                isValidUserDispatcher(request, response);
+                selectUserDispatcher(request, response);
+            }else if(type.equals("noisvalid")) {
+                noIsValidUserDispatcher(request, response);
+                selectUserDispatcher(request, response);
             }
-            
-            List<Grade> list = mGradeDao.findAll();
+            List<Grade> list = new ArrayList<Grade>();
+            int currentUserType = Format.str2Int(request.getSession().getAttribute("userTypeId"));
+            if (currentUserType == 2 || currentUserType == 3) {
+                int userId = Format.str2Int(request.getSession().getAttribute("userId"));
+                Grade grade = mGradeDao.findById(mUserDao.findById(userId).getGradeID());
+                list.add(grade);
+            }else if(currentUserType == 1) {
+                list = mGradeDao.findAll();
+            }
             request.setAttribute("gradelist", list);
-            
             String _grade = Format.null2Blank(request.getParameter("_grade"));
             String _usertype = Format.null2Blank(request.getParameter("_usertype"));
             request.setAttribute("gradeid", _grade);
@@ -158,6 +198,12 @@ public class UserServices {
                 User user = new User();
                 if(userid > 0) {
                     user.setId(userid);
+                }else {
+                    User userAccount = mUserDao.findByAccount(account);
+                    if(null != userAccount) {
+                        request.setAttribute("errorMsg", "此账号已经被添加过！");
+                        return;
+                    }
                 }
                 int _isvalid = Format.str2Int(request.getParameter("_isvalid"));
                 user.setName(name);
@@ -187,6 +233,36 @@ public class UserServices {
             User user = new User();
             user.setId(userid);
             mUserDao.del(user);
+        } catch (Exception e) {
+        }
+    }
+    
+    /**
+     * 更新用户为有效
+     * @param request
+     * @param response 
+     */
+    public void isValidUserDispatcher(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            int userid = Format.str2Int(request.getParameter("_userid"));
+            User user = new User();
+            user.setId(userid);
+            mUserDao.updateIsValid(userid, 1);
+        } catch (Exception e) {
+        }
+    }
+    
+    /**
+     * 更新用户为无效
+     * @param request
+     * @param response 
+     */
+    public void noIsValidUserDispatcher(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            int userid = Format.str2Int(request.getParameter("_userid"));
+            User user = new User();
+            user.setId(userid);
+            mUserDao.updateIsValid(userid, 0);
         } catch (Exception e) {
         }
     }

@@ -25,9 +25,9 @@ public class FunctionServices {
     
     public RequestDispatcher functionListInit(HttpServletRequest request, HttpServletResponse response) {
         try {
-            String userID = Format.null2Blank(request.getSession().getAttribute("userId"));
+            String userTypeId = Format.null2Blank(request.getSession().getAttribute("userTypeId"));
             FunctionDao functionDao = new FunctionDao();
-            List<Function> list = functionDao.findByUserId(userID);
+            List<Function> list = functionDao.findByUserTypeId(userTypeId);
             request.getSession().setAttribute("functionlist", list);
             return request.getRequestDispatcher("/WEB-INF/jsp/application.jsp");
         } catch (Exception ex) {

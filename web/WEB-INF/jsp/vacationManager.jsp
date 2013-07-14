@@ -20,16 +20,18 @@
                 $("#_enddate").datepicker();
                 $("#_enddate").datepicker( "option", "dateFormat", "yy-mm-dd");
                 $("#_adddiv").hide();
+                //绑定增加班级事件 点击后 显示增加班级div
                 $("#_addvacation").click(function () {
                     $("#_adddiv").show();
                     $("#_type").val("add");
                 });
+                //绑定所有class为_delvacation的<a>标签点击事件
                 $("._delvacation").each(function() {
                     $(this).click(function() {
                         if(confirm("确定删除吗？")) {
-                            $("#_type").val("del");
-                            $("#_vacationid").val($(this).attr("val"));
-                            $("#_form1").submit();
+                            $("#_type").val("del");//更改类型为del
+                            $("#_vacationid").val($(this).attr("val"));//更改假期id
+                            $("#_form1").submit();//提交form
                         }
                     });
                 });

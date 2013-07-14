@@ -17,11 +17,11 @@
         <script type="text/javascript">
             $(document).ready(function () {
                 $("#_selectfacilities").click(function () {
-                    $("#_type").val("select");//查询按钮点击后类型为select
+                    $("#_type").val("select");//查询按钮点击后更改请求类型为select
                     $("#_form1").submit();
                 });
                 $("#_month").datepicker({//添加日期选择功能 
-                    changeMonth: true,
+                    changeMonth: true,//允许以下拉列表方式更改月份
 //                    changeYear: true,
                     numberOfMonths:1,//显示几个月  
                     showButtonPanel:true,//是否显示按钮面板  
@@ -37,12 +37,12 @@
                     //dayNamesShort: ['周日','周一','周二','周三','周四','周五','周六'],  
                     //dayNamesMin: ['日','一','二','三','四','五','六'],  
                     onClose: function(dateText, inst) {
-                        var date = dateText.split("-");
+                        var date = dateText.split("-");//去掉日只留年月 例如2013-07-13 更改为2013-07
                         $(this).val(date[0] + "-" + date[1]);
                     }
                 });
                 var monthDate = '<%=Format.null2Blank(request.getAttribute("monthDate"))%>';
-                $("#_month").val(monthDate);
+                $("#_month").val(monthDate);//记录用户的日期选择
             });
         </script>
     </head>

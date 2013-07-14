@@ -12,11 +12,13 @@
         <script src="js/jquery.min.js" type="text/javascript"></script>
         <script type="text/javascript">
             $(document).ready(function () {
-                $("#_adddiv").hide();
-                $("#_addgrade").click(function () {
-                    $("#_adddiv").show();
-                    $("#_type").val("add");
+                $("#_adddiv").hide();//默认隐藏_adddiv
+                $("#_addgrade").click(function () {//绑定点击事件
+                    $("#_adddiv").show();//添加班级按钮点后显示adddiv
+                    $("#_type").val("add");//更改类型为add
                 });
+                //循环绑定class为_delgrade的<a>标签的点击事件
+                //点击后更改类型为del 并且传递给servlet要删除的班级id
                 $("._delgrade").each(function() {
                     $(this).click(function() {
                         if(confirm("确定删除吗？")) {

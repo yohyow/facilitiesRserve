@@ -8,7 +8,6 @@ import edu.facilities.dao.VacationDao;
 import edu.facilities.model.Vacation;
 import edu.facilities.utils.Format;
 import java.util.List;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,7 +40,7 @@ public class VacationServices {
             request.setAttribute("vacationlist", list);
         } catch (Exception e) {
         }
-        request.setAttribute("fid", 5);
+        request.setAttribute("fid", 4);
     }
     
     /**

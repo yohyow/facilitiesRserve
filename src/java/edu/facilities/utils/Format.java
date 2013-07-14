@@ -17,11 +17,11 @@ import java.util.Date;
 public class Format {
     
     //一年毫秒数
-    public static long LONG_ONE_YEAR = 366 * 24 * 60 * 60 * 1000;
+    public static final long LONG_ONE_YEAR = 366 * 24 * 60 * 60 * 1000;
     //两个月毫秒数
-    public static long LONG_TWO_MONTH = 31 * 24 * 60 * 60 * 1000;
+    public static final long LONG_TWO_MONTH = 2*31 * 24 * 60 * 60 * 1000;
     //一天毫秒数
-    public static long LONG_ONE_DAY = 24 * 60 * 60 * 1000;
+    public static final long LONG_ONE_DAY = 24 * 60 * 60 * 1000;
     
     public static String null2Blank(Object str) {
         String result = "";

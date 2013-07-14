@@ -46,6 +46,7 @@ public class GradeDao extends BaseDao<Grade, Integer> {
         ResultSet rs = ps.executeQuery();
         Grade grade = null;
         while(rs.next()) {
+            grade = new Grade();
             int id = rs.getInt("id");
             String name = rs.getString("name");
             grade.setId(id);

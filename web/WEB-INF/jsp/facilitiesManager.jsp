@@ -10,30 +10,39 @@
         <link href="css/facility_style.css" rel="stylesheet" type="text/css" />
         <script src="js/jquery.min.js" type="text/javascript"></script>
         <script type="text/javascript">
+            //此写法应用的是现在比较成熟的javascript框架
+            //表示在html的document元素都加载完成后要执行的动作
             $(document).ready(function () {
+                //给id为_selectfacilities的html标签绑定点击事件
+                //给查询按钮绑定点击事件 点击后更改id为_type的input值为select
+                //然后提交form
                 $("#_selectfacilities").click(function () {
                     $("#_type").val("select");//查询按钮点击后类型为select
                     $("#_form1").submit();
                 });
+                //表示让id为_adddiv的标签隐藏
                 $("#_adddiv").hide();
+                //在添加设备按钮点击后 让id为_adddiv的标签显示 并更改_type的input值为add
                 $("#_addfacilitiesinfo").click(function () {
                     $("#_adddiv").show();
                     $("#_type").val("add");
                 });
+                //表示class为_delfacilitiesinfo的标签进行循环绑定点击事件
                 $("._delfacilitiesinfo").each(function() {
                    $(this).click(function() {
-                       if(confirm("确定删除吗？")) {
-                            $("#_type").val("del");
-                            $("#_facilitiesinfoid").val($(this).attr("val"));
-                            $("#_form1").submit();
+                       if(confirm("确定删除吗？")) {//表示点击后 先弹出确认对话框
+                            $("#_type").val("del");//如果点击确定则更改type值为del
+                            $("#_facilitiesinfoid").val($(this).attr("val"));//更改_facilitiesinfoid的值为_delfacilitiesinfo的val属性的值
+                            $("#_form1").submit();//提交form
                        }
                    });
                 });
-                
+                //得到servlet传递过来的设备类型选择
                 var usertype = "<%=Format.null2Blank(request.getAttribute("facilitiestype"))%>";
+                //循环name为facilitiesTypeId的select 的 option 绑定selected属性值
                 $("select[@name='facilitiesTypeId'] option").each(function() {
-                   if($(this).attr("value") == usertype) {
-                       $(this).attr("selected", "selected");
+                   if($(this).attr("value") == usertype) {//循环找到value值为servlet传过来的值相等的option
+                       $(this).attr("selected", "selected"); //设置为selected选中状态
                    } 
                 });
             });

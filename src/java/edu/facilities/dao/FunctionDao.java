@@ -38,7 +38,13 @@ public class FunctionDao extends BaseDao<Function, Integer> {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    public List<Function> findByUserId(String id) throws Exception{
+    /**
+     * 某用户类型下的功能列表
+     * @param id
+     * @return
+     * @throws Exception 
+     */
+    public List<Function> findByUserTypeId(String id) throws Exception{
         StringBuilder sql = new StringBuilder();
         sql.append("select f.* from fr_function as f, fr_function_user as fu where fu.FUNCTIONID = f.ID and fu.USERID = ");
         sql.append(id);

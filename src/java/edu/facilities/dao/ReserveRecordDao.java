@@ -173,19 +173,21 @@ public class ReserveRecordDao extends BaseDao<ReserveRecord, Integer> {
     }
     
     /**
-     * 找到某用户对某设备的预约记录
+     * 找到某用户某段时间的预约记录
      * @param userId
      * @param facilityId
      * @return
      * @throws Exception 
      */
-    public List<ReserveRecord> findReserveRecordByUserIdAndFacilityId(int userId, int facilityId) throws Exception{
+    public List<ReserveRecord> findReserveRecordByUserIdAndDate(int userId, String fromDate, String toDate) throws Exception{
         StringBuilder sql = new StringBuilder();
         sql.append("select * from fr_reserverecord where userid = ");
         sql.append(userId);
-        sql.append(" and facilityId = ");
-        sql.append(facilityId);
-        sql.append(" order by enddate desc");
+        sql.append(" and TimeStamp(startdate) >= TimeStamp('");
+        sql.append(fromDate);
+        sql.append("') and TimeStamp(enddate) <= TimeStamp('");
+        sql.append(toDate);
+        sql.append("') order by enddate desc");
         PreparedStatement ps = getPreparedStatement(sql.toString());
         ResultSet rs = ps.executeQuery();
         List<ReserveRecord> list = new ArrayList<ReserveRecord>();
@@ -198,7 +200,7 @@ public class ReserveRecordDao extends BaseDao<ReserveRecord, Integer> {
     }
     
     /**
-     * 找到某用户对某设备的预约记录
+     * 找到某用户没过期的预约记录
      * @param userId
      * @param nowDate
      * @return

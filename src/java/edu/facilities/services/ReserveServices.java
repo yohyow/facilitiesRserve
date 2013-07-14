@@ -47,34 +47,30 @@ public class ReserveServices {
         if (facilitiesTypeId > 0) {
             try {
                 int facilitiesInfoId = Format.str2Int(request.getParameter("facilitiesInfoId"));
+                facilitiesInfo = mFacilitiesInfoDao.findById(facilitiesInfoId);
+                request.setAttribute("facilitiesInfo", facilitiesInfo);
+                request.setAttribute("facilitiesInfoList", mFacilitiesInfoDao.findByTypeID(String.valueOf(facilitiesTypeId)));
+                request.setAttribute("facilitiesInfoId", facilitiesInfoId);
+                if (type.equals("add")) {
+                    addDispatcher(request, response, facilitiesInfo);
+                }else if(type.equals("cancle")) {
+                    cancleDispatcher(request, response);
+                }else if(type.equals("absence")) {
+                    absenceDispatcher(request, response);
+                }else if(type.equals("noabsence")) {
+                    noAbsenceDispatcher(request, response);
+                }
                 if (facilitiesInfoId > 0) {
                     List<ReserveRecord> list = mReserveRecordDao.findByFacilityID(facilitiesInfoId);
                     request.setAttribute("reserveRecordList", list);
                 }
-                request.setAttribute("facilitiesInfoList", mFacilitiesInfoDao.findByTypeID(String.valueOf(facilitiesTypeId)));
-                request.setAttribute("facilitiesInfoId", facilitiesInfoId);
-                facilitiesInfo = mFacilitiesInfoDao.findById(facilitiesInfoId);
-                request.setAttribute("facilitiesInfo", facilitiesInfo);
             } catch (Exception e) {
             }
         }
         mUserTypeId = Format.str2Int(request.getSession().getAttribute("userTypeId"));
         mUserId = Format.str2Int(request.getSession().getAttribute("userId"));
-        try {
-            if (type.equals("add")) {
-                addDispatcher(request, response, facilitiesInfo);
-            }else if(type.equals("cancle")) {
-                cancleDispatcher(request, response);
-            }else if(type.equals("absence")) {
-                absenceDispatcher(request, response);
-            }else if(type.equals("noabsence")) {
-                noAbsenceDispatcher(request, response);
-            }
-        } catch (Exception e) {
-        }
-        
         request.setAttribute("facilitiesTypeId", facilitiesTypeId);
-        request.setAttribute("fid", 4);
+        request.setAttribute("fid", 3);
         request.setAttribute("currentdate", Format.formatDate(new Date()));
     }
     /**
@@ -140,9 +136,11 @@ public class ReserveServices {
         ReserveRecord rr = mReserveRecordDao.findById(reserverecordid);
         if (null != rr) {
             if (mUserTypeId == 4) {//学生
+                Calendar calendar = Calendar.getInstance();
                 Date nDate = new Date();
-                nDate.setTime(nDate.getTime() + Format.LONG_ONE_DAY);
-                if(Format.compareDateWithDate(nDate, Format.formatDate(rr.getStartDate())) == 1) {
+                calendar.setTime(nDate);
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                if(Format.compareDateWithDate(calendar.getTime(), Format.formatDate(rr.getStartDate())) == 1) {
                     request.setAttribute("errorMsg", "无法取消，您需要提前24小时取消预约！");
                     return;
                 }
@@ -154,7 +152,6 @@ public class ReserveServices {
                 request.setAttribute("errorMsg", "取消预约失败！");
             }
         }
-        request.setAttribute("errorMsg", "预约记录已经不存在！");
     }
     
     /**
@@ -206,14 +203,16 @@ public class ReserveServices {
                 return "结束日期要大于开始日期，请重新选择";
             }
             Date nDate = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(nDate);
             if (mUserTypeId == 2 || mUserTypeId == 3) {//操作员或者老师
-                nDate.setTime(nDate.getTime() + Format.LONG_ONE_YEAR);
-                if (Format.compareDateWithDate(nDate, Format.formatDate(fromstartdate)) == -1) {
+                calendar.add(Calendar.YEAR, 1);
+                if (Format.compareDateWithDate(calendar.getTime(), Format.formatDate(fromstartdate)) == -1) {
                     return "您只能预约一年以内的设备！";
                 }
             }else if(mUserTypeId == 4) {//学生
-                nDate.setTime(nDate.getTime() + Format.LONG_TWO_MONTH);
-                if (Format.compareDateWithDate(nDate, Format.formatDate(fromstartdate)) == -1) {
+                calendar.add(Calendar.DAY_OF_MONTH, 62);
+                if (Format.compareDateWithDate(calendar.getTime(), Format.formatDate(fromstartdate)) == -1) {
                     return "您只能预约两个月以内的设备！";
                 }
                 // 查下学生的预约设备数 不能超过五个
@@ -282,7 +281,7 @@ public class ReserveServices {
         }
         request.setAttribute("maxdate", getMaxAndMinDate(new Date(), false)[0]);
         request.setAttribute("monthDate", monthDate);
-        request.setAttribute("fid", 7);
+        request.setAttribute("fid", 6);
     } 
     
     /**

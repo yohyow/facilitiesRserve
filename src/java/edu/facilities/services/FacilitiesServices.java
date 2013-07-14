@@ -10,7 +10,6 @@ import edu.facilities.model.FacilitiesInfo;
 import edu.facilities.utils.Format;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +43,7 @@ public class FacilitiesServices {
         }
         request.setAttribute("facilitiesList", list);
         request.setAttribute("facilitiestype", facilitiesTypeId);
-        request.setAttribute("fid", 3);
+        request.setAttribute("fid", 2);
     }
     
     /**

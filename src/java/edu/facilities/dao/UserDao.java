@@ -143,11 +143,11 @@ public class UserDao extends BaseDao<User, Integer> {
      * @return
      * @throws Exception 
      */
-    public int updateIsValid(String id, int isvalid) throws Exception{
+    public int updateIsValid(int id, int isvalid) throws Exception{
         StringBuilder sql = new StringBuilder();
         sql.append("update fr_user set isvalid = ");
         sql.append(isvalid);
-        sql.append(", where id = ");
+        sql.append(" where id = ");
         sql.append(id);
         PreparedStatement ps = getPreparedStatement(sql.toString());
         return ps.executeUpdate();

@@ -18,7 +18,8 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 var type = '<%=Format.null2Blank(request.getAttribute("type"))%>';
-                if(type == "") {
+                //根据servlet传递过来的type选择是显示用户查询还是设备查询
+                if(type == "") {//默认显示用户选择
                     selectuser();
                     $("#_type").val("selectuser");
                 }else if(type == 'selectuser'){
@@ -28,42 +29,50 @@
                     selectfacility();
                     $("#_type").val(type);
                 }
-                
+                //给id为_startdate的添加日期选择控件
                 $("#_startdate").datepicker();
+                //格式化日期格式yy-mm-dd
                 $("#_startdate").datepicker( "option", "dateFormat", "yy-mm-dd");
                 $("#_enddate").datepicker();
                 $("#_enddate").datepicker( "option", "dateFormat", "yy-mm-dd");
                 var startdate = '<%=Format.null2Blank(request.getAttribute("startdate"))%>';
                 var enddate = '<%=Format.null2Blank(request.getAttribute("enddate"))%>';
+                //记录用户的选择日期
                 $("#_startdate").val(startdate);
                 $("#_enddate").val(enddate);
+                //给用户类型添加选择监听 下拉列表值改变时更改类型为selectuser并提交form
                 $("#li_usertype").change(function() {
                     $("#_type").val("selectuser");
                     $("#_form1").submit();
                 });
+                //设备类型更改时提交form
                  $("#select_facilitiesTypeId").change(function() {
                     $("#_form1").submit();
                 });
-                $("#select_facilitiesInfoId").change(function() {
-                    $("#_form1").submit();
-                });
+//                $("#select_facilitiesInfoId").change(function() {
+//                    $("#_form1").submit();
+//                });
             });
+            
             function selectuser() {
-                $("#li_startdate").hide();
-                $("#li_enddate").hide();
-                $("#_selectfacilities").hide();
+                //隐藏设备类型 、 设备两个select下拉列表
+                $("#li_facilitiestype").hide();
+                $("#li_facilityinfo").hide();
+                //显示用户类型、用户、班级下拉列表
                 $("#li_usertype").show();
                 $("#li_user").show();
                 $("#li_grade").show();
                 $("#_type").val("selectuser");//查询按钮点击后类型为selectuser
             }
             function selectfacility() {
+                //隐藏用户类型、用户、班级下拉列表
                 $("#li_usertype").hide();
                 $("#li_user").hide();
                 $("#li_grade").hide();
-                $("#li_startdate").show();
-                $("#li_enddate").show();
-                $("#_selectfacilities").show();
+                //显示设备类型 、 设备两个select下拉列表
+                $("#li_facilitiestype").show();
+                $("#li_facilityinfo").show();
+//                $("#_selectfacilities").show();
                 $("#_type").val("selectfacility");//查询按钮点击后类型为selectfacility
             }
         </script>
@@ -116,9 +125,14 @@
                             <label>用户类型:</label>
                             <select name="_usertype" class="personnel_width">
                                 <option value="0" <%=userTypeId == 0 ? "selected = 'selected'":""%>>请选择</option>
-                                <option value="2" <%=userTypeId == 2 ? "selected = 'selected'":""%>>操作员</option>
-                                <option value="3" <%=userTypeId == 3 ? "selected = 'selected'":""%>>老师</option>
-                                <option value="4" <%=userTypeId == 4 ? "selected = 'selected'":""%>>学生</option>
+                                <%
+                                    int currentUserType = Format.str2Int(request.getSession().getAttribute("userTypeId"));
+                                    if((currentUserType == 2) || (currentUserType == 3)) {
+                                        out.print("<option value='4' " + (userTypeId == 4 ? "selected = 'selected'":"") + ">学生</option>");
+                                    }else if(currentUserType == 1) {
+                                        out.print("<option value='2' " + (userTypeId == 2 ? "selected = 'selected'":"") + ">操作员</option><option value='3' " + (userTypeId == 3 ? "selected = 'selected'":"") + ">老师</option><option value='4' " + (userTypeId == 4 ? "selected = 'selected'":"") + ">学生</option>");
+                                    }
+                                %>
                             </select>
                         </li>
                         
@@ -153,7 +167,7 @@
                         int ftypeid = Format.str2Int(request.getAttribute("facilitiesTypeId"));
                         int facilitiesInfoId = Format.str2Int(request.getAttribute("facilitiesInfo"));
                     %>
-                        <li class="personnel_top_sel">
+                    <li class="personnel_top_sel" id="li_facilitiestype">
                              <label>设备类型：</label><select id="select_facilitiesTypeId" name="facilitiesTypeId" class="personnel_width">
                                 <option value="0" <%=ftypeid == 0 ? "selected = 'selected'":""%>>请选择</option>
                                 <option value="1" <%=ftypeid == 1 ? "selected = 'selected'":""%>>篮球室</option>
@@ -161,7 +175,7 @@
                                 <option value="3" <%=ftypeid == 3 ? "selected = 'selected'":""%>>乒乓球室</option>
                             </select>
                         </li>
-                        <li class="personnel_top_sel">
+                        <li class="personnel_top_sel" id="li_facilityinfo">
                              <label>设备：</label><select id="select_facilitiesInfoId"name="facilitiesInfoId" class="personnel_width">
                                 <option value="0">请选择</option>
                                 <%

@@ -7,7 +7,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>体育设施预约系统</title>
+        <title>体育设施预约系统－人员管理</title>
         <link href="css/facility_style.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="css/jquery-ui.css" type="text/css" media="all" />
         <script src="js/jquery.min.js" type="text/javascript"></script>   
@@ -28,32 +28,49 @@
                     $("#_selectlistdiv").hide();
                 });
                 var usertype = "<%=Format.null2Blank(request.getAttribute("usertype"))%>";
+                //给用户类型select为_usertype的option循环值为usertype更改为selected
                 $("select[@name='_usertype'] option").each(function() {
                     if($(this).text() == usertype) {
                         $(this).attr("selected", "selected");
                     } 
                 });
                 var type = "<%=Format.null2Blank(request.getAttribute("type"))%>";
+                //如果类型edit或者add 则显示添加div 隐藏查询条件和列表
                 if(type == "edit" || type == 'add') {
                     $("#_adddiv").show();
                     $("#_selectul").hide();
                     $("#_selectlistdiv").hide();
-                }else {
+                }else {//否则隐藏添加用户div 显示查询条件和列表
                     $("#_adddiv").hide();
                     $("#_selectul").show();
                     $("#_selectlistdiv").show();
                 }
-                $("#_submit").click(function (){
-                    
-                });
+                //无用
+//                $("#_submit").click(function (){
+//                    
+//                });
             });
+            //编辑时会调用此函数
             function edit(_id) {
                 $("#_type").val("edit");//添加用户按钮点击后类型为edit
                 $("#_userid").val(_id);
                 $("#_form1").submit();
             }
+            //删除时会调用此函数
             function del(_id) {
-                $("#_type").val("del");//添加用户按钮点击后类型为edit
+                $("#_type").val("del");//点击后类型为del
+                $("#_userid").val(_id);
+                $("#_form1").submit();
+            }
+            //设置是否有效函数
+            function isvalid(_id) {
+                $("#_type").val("isvalid");//点击后类型为isvalid
+                $("#_userid").val(_id);
+                $("#_form1").submit();
+            }
+            //设置是否无效函数
+            function noisvalid(_id) {
+                $("#_type").val("noisvalid");//点击后类型为noisvalid
                 $("#_userid").val(_id);
                 $("#_form1").submit();
             }
@@ -94,16 +111,25 @@
                         <li class="personnel_top_sel">
                             <label>用户类型:</label>
                             <select name="_usertype" class="personnel_width">
-                                <option value="2">操作员</option>
-                                <option value="3">老师</option>
-                                <option value="4">学生</option>
+                                <%
+                                    int currentUserType = Format.str2Int(request.getSession().getAttribute("userTypeId"));
+                                    if((currentUserType == 2) || (currentUserType == 3)) {
+                                        out.print("<option value='4'>学生</option>");
+                                    }else if(currentUserType == 1) {
+                                        out.print("<option value='2'>操作员</option><option value='3'>老师</option><option value='4'>学生</option>");
+                                    }
+                                %>
                             </select>
                         </li>
                         <li class="personnel_top_sel">
                             <input type="button" id="_selectuser" value="查询" />
                         </li>
                         <li class="personnel_top_sel">
-                            <input type="button" id="_adduser" value="添加新用户" />
+                            <%
+                                    if(currentUserType == 1) {
+                                        out.print("<input type='button' id='_adduser' value='添加新用户' />");
+                                    }
+                                %>
                         </li>
                     </ul>
                     <div class="personnel_list" id="_selectlistdiv">
@@ -117,6 +143,7 @@
                                         sb.append("<ul>");
                                         sb.append("<li>姓名</li>");
                                         sb.append("<li>类型</li>");
+                                        sb.append("<li>是否有效</li>");
                                         sb.append("<li>缺席次数</li>");
                                         sb.append("<li class='action'>操作</li>");
                                         sb.append("</ul>");
@@ -129,14 +156,35 @@
                                             sb.append(Format.null2Blank(request.getAttribute("usertype")));
                                             sb.append("</li>");
                                             sb.append("<li>");
+                                            if(_user.getIsValid() == 1) {
+                                                sb.append("有效");
+                                            }else {
+                                                sb.append("无效");
+                                            }
+                                            sb.append("</li>");
+                                            sb.append("<li>");
                                             sb.append(_user.getAbsenceNum());
                                             sb.append("</li>");
                                             sb.append("<li class='action'>");
-                                            sb.append("<a href='javascript:edit(");
-                                            sb.append(_user.getId());
-                                            sb.append(")' >编辑</a>&nbsp;&nbsp;&nbsp;<a href='javascript:del(");
-                                            sb.append(_user.getId());
-                                            sb.append(")' >删除</a></li>");
+                                            if(((currentUserType == 2) || (currentUserType == 3))) {
+                                                if(_user.getIsValid() == 1) {
+                                                    sb.append("<a href='javascript:noisvalid(");
+                                                    sb.append(_user.getId());
+                                                    sb.append(")' >无效</a>");
+                                                }else {
+                                                    sb.append("<a href='javascript:isvalid(");
+                                                    sb.append(_user.getId());
+                                                    sb.append(")' >有效</a>");
+                                                }
+                                                
+                                            }else if(currentUserType == 1) {
+                                                sb.append("<a href='javascript:edit(");
+                                                sb.append(_user.getId());
+                                                sb.append(")' >编辑</a>&nbsp;&nbsp;&nbsp;<a href='javascript:del(");
+                                                sb.append(_user.getId());
+                                                sb.append(")' >删除</a>");
+                                            }
+                                            sb.append("</li>");
                                             sb.append("</ul>");
                                         }
                                     } catch (Exception e) {
